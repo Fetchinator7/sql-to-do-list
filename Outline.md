@@ -23,6 +23,7 @@ Allow a task to repeat automatically
 Click on a category/attribute to toggle between sorting by that ASC or DESC
 Play sound effects when a task is completed, deleted, etc.
 Assign a category for a task.
+Edit any attribute by clicking it and changing it.
 Filter viewing options such as only showing !!! tasks.
 
 ## Setup:
@@ -36,4 +37,4 @@ delete the task with ID "id"
 method: post /add
 Pass in an object for a new task.
 method: get /
-Get all of the tasks in the table.
+Get all of the tasks in the table (add a sorting option?).

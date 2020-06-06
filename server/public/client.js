@@ -1,10 +1,11 @@
 $(document).ready(onReady);
 
 const inputFields = [$('#input1'), $('#input2')];
+const requiredInputFields = [$('#input1')];
 
 function onReady() {
-  $('#submit').on('click', primaryAction);
-  $('.inputField').on('keydown', removeBoxWarning);
+  $('#addTaskButton').on('click', primaryAction);
+  $('.viewTasks').on('keydown', removeBoxWarning);
 }
 
 function primaryAction() {
@@ -25,7 +26,7 @@ function removeBoxWarning(event) {
 function checkIfInputFieldsWereFilled() {
   // Remove the error message (only noticeable if it's currently displayed.)
   $('#inputAttributeError').fadeOut(300);
-  for (const inputField of inputFields) {
+  for (const inputField of requiredInputFields) {
     // Remove the red highlighting from each box (it will be added again if it's still empty.)
     $(inputField).removeClass('blankValue');
     if (inputField.val() === '') {
