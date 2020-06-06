@@ -120,14 +120,17 @@ function addToDOM(response) {
         // the table so embed that which allows updates to be made later.
         $(jQueryObj).attr(dataID, koalaVal);
       } else if (koalaKey === 'completed') {
-        appendRowStr += `<td>${koalaVal}</td>`;
         if (koalaVal === true) {
+          appendRowStr += '<td><input type="checkbox" class="toggleCompleted" checked></td>';
           // Add a class for display purposes and a arbitrary value for whether or not
           // a book has been read into the html data.
           $(jQueryObj).addClass(cssCompleted).attr(dataCompleted, true);
         } else {
+          appendRowStr += '<td><input type="checkbox" class="toggleCompleted"></td>';
           $(jQueryObj).addClass(cssNotCompleted).attr(dataCompleted, false);
         }
+      } else if (koalaVal === null) {
+        appendRowStr += '<td></td>';
       } else {
         // The current bookKey doesn't have a preset so just add verbatim whatever the
         // key and value is to the DOM.
@@ -137,8 +140,7 @@ function addToDOM(response) {
     // Add a button for toggling if a book has been read and deleting a book which are then
     // updated in the table.
     const buttonText = '<button class="deleteTask"> Delete </button>';
-    const readyForTransportToggle = '<button class="toggleCompleted"> Transfer </button>';
-    $(jQueryObj.html(appendRowStr).append(readyForTransportToggle).append(buttonText));
+    $(jQueryObj.html(appendRowStr).append(buttonText));
     // Add this big long element to the books HTML table.
     $('#viewTasks').append(jQueryObj);
   }
@@ -151,8 +153,8 @@ function addToDOM(response) {
 function toggleCompleted(event) {
   const buttonEvent = event.target;
   // Extract the unique identifier of a book stored in the row header.
-  const itemID = $(buttonEvent).parent().attr(dataID);
-  const itemAttributeBool = $(buttonEvent).parent().attr(dataCompleted);
+  const itemID = $(buttonEvent).closest('tr').attr(dataID);
+  const itemAttributeBool = $(buttonEvent).closest('tr').attr(dataCompleted);
   // Set the new value to the opposite of the input value.
   let toggledAttr;
   if (itemAttributeBool === 'true') {
@@ -167,11 +169,11 @@ function toggleCompleted(event) {
     // Change the text of the box two prior to the to the new bool value.
     // $(event.target).prev().prev().text(toggledAttr);
 
-    $(buttonEvent).parent().attr(dataCompleted, toggledAttr);
+    $(buttonEvent).closest('tr').attr(dataCompleted, toggledAttr);
     if (toggledAttr === true) {
-      $(buttonEvent).parent().addClass(cssCompleted).removeClass(cssNotCompleted);
+      $(buttonEvent).closest('tr').addClass(cssCompleted).removeClass(cssNotCompleted);
     } else {
-      $(buttonEvent).parent().addClass(cssNotCompleted).removeClass(cssCompleted);
+      $(buttonEvent).closest('tr').addClass(cssNotCompleted).removeClass(cssCompleted);
     }
   }).catch(() => {
     alert('Oh no, that post was rejected :(');

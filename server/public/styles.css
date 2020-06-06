@@ -1,0 +1,25 @@
+.completed {
+ background-color: #deffdc;
+}
+
+.notCompleted td:nth-child(1) {
+ background-color: #ffe1e1;
+}
+
+/* Generic message in the bottom left */
+#inputAttributeError {
+ /* Set to invisible by default. */
+ display: none;
+ color: whitesmoke;
+ background-color: red;
+ padding: 10px;
+ border-radius: 20px;
+ position: fixed;
+ bottom: 0px;
+ left: 15px;
+}
+
+/* As input field was left blank so highlight it in red. */
+.blankValue {
+ background-color: rgb(255, 0, 0);
+}
