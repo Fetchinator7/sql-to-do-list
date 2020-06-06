@@ -8,7 +8,7 @@ const pool = require('../modules/pool');
 // GET /koalas/?sort=id
 listRouter.get('/', (req, res) => {
   const sort = req.query.sort; // name (or whatever gets passed in)
-  let sortBy = 'name'; // default
+  let sortBy = 'title'; // default
   if (sort === 'id') {
     sortBy = 'id';
   } else if (sort === 'status') {
@@ -33,9 +33,15 @@ listRouter.post('/', (req, res) => {
   const newTask = req.body;
   console.log('Adding koala', newTask);
   const queryText = 'INSERT INTO "list" ("title", "completed", "priority", "due", "notes") VALUES ($1, $2, $3, $4, $5);';
+  let completed;
+  if (newTask.completed === undefined) {
+    completed = false;
+  } else {
+    completed = newTask.completed;
+  }
   pool.query(queryText, [
     newTask.title,
-    newTask.completed,
+    completed,
     newTask.priority,
     newTask.due,
     newTask.notes
@@ -44,14 +50,14 @@ listRouter.post('/', (req, res) => {
       res.sendStatus(201);
     })
     .catch((error) => {
-      console.log(`Error adding new task ${error}`);
+      console.log(`Error adding new task: "${error}"`);
       res.sendStatus(500);
     });
 });
 
 listRouter.delete('/:id', (req, res) => {
   const taskId = req.params.id;
-  const queryText = 'DELETE FROM "list" WHERE id=$1';
+  const queryText = 'DELETE FROM "list" WHERE task_id=$1';
   pool
     .query(queryText, [taskId])
     .then(() => {
@@ -59,7 +65,7 @@ listRouter.delete('/:id', (req, res) => {
       res.sendStatus(200);
     })
     .catch((err) => {
-      console.log(`An error occurred while trying to delete task with id "${taskId}"`, err);
+      console.log(`An error occurred while trying to delete task with task_id ${taskId}, "${err}"`);
       res.sendStatus(500);
     });
 });
@@ -70,7 +76,7 @@ listRouter.put('/:id/:completed', (req, res) => {
   const completed = req.params.completed;
   // Set the queryText to update to "true" or "false" depending on
   // what it currently is at the specific id
-  const queryText = 'UPDATE "list" SET "ready_to_transfer"=$1 WHERE id=$2;';
+  const queryText = 'UPDATE "list" SET "completed"=$1 WHERE task_id=$2;';
   pool.query(queryText, [completed, taskId])
     .then(() => {
       console.log('Successfully updated completed status!');
