@@ -2,10 +2,68 @@ $(document).ready(onReady);
 
 const inputFields = [$('#input1'), $('#input2')];
 const requiredInputFields = [$('#input1')];
+const dataID = 'data-task-table-id';
+const dataCompleted = 'data-task-completed-bool';
+const cssCompleted = 'completed';
+const cssNotCompleted = 'notCompleted';
 
 function onReady() {
   $('#addTaskButton').on('click', primaryAction);
   $('.viewTasks').on('keydown', removeBoxWarning);
+  getTasks();
+}
+
+function getTasks() {
+  $.ajax({
+    type: 'GET',
+    url: '/list'
+  }).then((response) => {
+    addToDOM(response);
+  }).catch(() => {
+    alert('Oh no, that get was rejected :(');
+  }); // end getKoalas
+  // ajax call to server to get koalas
+}
+
+// Delete the book from the database and visually remove the book
+// so it doesn't have to make another query just to update that book.
+function deleteTask(event) {
+  const row = $(event.target).parent();
+  const tableDatabaseTableId = $(event.target).parent().attr(dataID);
+  $.ajax({
+    method: 'DELETE',
+    url: '/list/' + tableDatabaseTableId
+  }).then(() => {
+    $(row).fadeOut(800, () => {
+      $(row).remove();
+    });
+  }).catch(() => {
+    alert('Oh no, that delete was rejected :(');
+  });
+}
+
+function addTaskToTable() {
+  const inputFieldValuesArr = checkIfInputFieldsWereFilled();
+  if (inputFieldValuesArr.length !== 0) {
+    const taskToAdd = {
+      completed: inputFields[0].val(),
+      title: inputFields[1].val(),
+      priority: inputFields[2].val(),
+      due: inputFields[3].val(),
+      notes: inputFields[4].val()
+    };
+    $.ajax({
+      method: 'POST',
+      url: '/list',
+      data: taskToAdd
+    }).then(() => {
+      emptyInputFields();
+      getTasks();
+      updatejQuery();
+    }).catch(() => {
+      alert('Oh no, that post was rejected :(');
+    });
+  }
 }
 
 function primaryAction() {
@@ -57,18 +115,18 @@ function addToDOM(response) {
     for (const koalaKey in koalaObj) {
       const koalaVal = koalaObj[koalaKey];
       // If the inputs match certain strings format them to look prettier.
-      if (koalaKey === 'id') {
+      if (koalaKey === 'task_id') {
         // The (arbitrary) "id" column is the unique identifier for the current book in
         // the table so embed that which allows updates to be made later.
-        $(jQueryObj).attr('data-item-table-id', koalaVal);
-      } else if (koalaKey === 'ready_to_transfer') {
+        $(jQueryObj).attr(dataID, koalaVal);
+      } else if (koalaKey === 'completed') {
         appendRowStr += `<td>${koalaVal}</td>`;
         if (koalaVal === true) {
           // Add a class for display purposes and a arbitrary value for whether or not
           // a book has been read into the html data.
-          $(jQueryObj).addClass('readyForTransport').attr('data-ready-for-transport', true);
+          $(jQueryObj).addClass(cssCompleted).attr(dataCompleted, true);
         } else {
-          $(jQueryObj).addClass('notReadyForTransport').attr('data-ready-for-transport', false);
+          $(jQueryObj).addClass(cssNotCompleted).attr(dataCompleted, false);
         }
       } else {
         // The current bookKey doesn't have a preset so just add verbatim whatever the
@@ -78,11 +136,11 @@ function addToDOM(response) {
     }
     // Add a button for toggling if a book has been read and deleting a book which are then
     // updated in the table.
-    const buttonText = '<button class="deleteKoala"> Delete </button>';
-    const readyForTransportToggle = '<button class="toggleKoala"> Transfer </button>';
+    const buttonText = '<button class="deleteTask"> Delete </button>';
+    const readyForTransportToggle = '<button class="toggleCompleted"> Transfer </button>';
     $(jQueryObj.html(appendRowStr).append(readyForTransportToggle).append(buttonText));
     // Add this big long element to the books HTML table.
-    $('#viewKoalas').append(jQueryObj);
+    $('#viewTasks').append(jQueryObj);
   }
   // Let jQuery know about the new buttons that have been added.
   updatejQuery();
@@ -90,11 +148,11 @@ function addToDOM(response) {
 
 // The "Toggle Read" button was clicked/pressed so change the classes
 // (for visual purposes) of that book and update that change in the database table.
-function toggleAttribute(event) {
+function toggleCompleted(event) {
   const buttonEvent = event.target;
   // Extract the unique identifier of a book stored in the row header.
-  const itemID = $(buttonEvent).parent().attr('data-item-table-id');
-  const itemAttributeBool = $(buttonEvent).parent().attr('data-item-attribute-bool');
+  const itemID = $(buttonEvent).parent().attr(dataID);
+  const itemAttributeBool = $(buttonEvent).parent().attr(dataCompleted);
   // Set the new value to the opposite of the input value.
   let toggledAttr;
   if (itemAttributeBool === 'true') {
@@ -104,16 +162,16 @@ function toggleAttribute(event) {
   }
   $.ajax({
     method: 'PUT',
-    url: `/koalas/${itemID}/${toggledAttr}`
+    url: `/list/${itemID}/${toggledAttr}`
   }).then(() => {
     // Change the text of the box two prior to the to the new bool value.
     // $(event.target).prev().prev().text(toggledAttr);
 
-    $(buttonEvent).parent().attr('data-item-attribute-bool', toggledAttr);
+    $(buttonEvent).parent().attr(dataCompleted, toggledAttr);
     if (toggledAttr === true) {
-      $(buttonEvent).parent().addClass('readyForTransport').removeClass('notReadyForTransport');
+      $(buttonEvent).parent().addClass(cssCompleted).removeClass(cssNotCompleted);
     } else {
-      $(buttonEvent).parent().addClass('notReadyForTransport').removeClass('readyForTransport');
+      $(buttonEvent).parent().addClass(cssNotCompleted).removeClass(cssCompleted);
     }
   }).catch(() => {
     alert('Oh no, that post was rejected :(');
@@ -122,5 +180,6 @@ function toggleAttribute(event) {
 
 // After the table is filled
 function updatejQuery() {
-  $('.toggleKoala').on('click', toggleAttribute);
+  $('.deleteTask').on('click', deleteTask);
+  $('.toggleCompleted').on('click', toggleCompleted);
 }

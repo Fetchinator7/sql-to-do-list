@@ -16,11 +16,11 @@
 
 <body>
     <section id="addTask">
-        <h2 id="addKoala" class="text">Add Koala</h2>
-        <div class="form">
-            <input type="text" id="nameIn" value="" class="inputField" placeholder="Name">
-            <input type="text" id="genderIn" value="" class="inputField" placeholder="Gender">
-            <input type="text" id="ageIn" value="" class="inputField numberField" placeholder="Age">
+        <h2>Add Task</h2>
+        <div class="taskInputForm">
+            <input type="text" id="titleIn" value="" class="inputField" placeholder="Title">
+            <input type="text" id="priorityIn" value="" class="inputField numberField" placeholder="Priority">
+            <input type="datetime" id="dueIn" value="" class="inputField" placeholder="Due Date">
             <input type="text" id="notesIn" value="" class="inputField" placeholder="Notes">
             <button type="button" id="addTaskButton">Add Koala</button>
         </div>
@@ -30,8 +30,8 @@
         <table class="table-bordered" id="koalaTable">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Gender</th>
+                    <th>Completed</th>
+                    <th>Title</th>
                     <th>Age</th>
                     <th>Ready for Transfer</th>
                     <th>Notes</th>
