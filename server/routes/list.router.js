@@ -31,7 +31,7 @@ listRouter.get('/', (req, res) => {
 
 listRouter.post('/', (req, res) => {
   const newTask = req.body;
-  console.log('Adding koala', newTask);
+  console.log('Adding task', newTask);
   const queryText = 'INSERT INTO "list" ("title", "completed", "priority", "due", "notes") VALUES ($1, $2, $3, $4, $5);';
   let completed;
   if (newTask.completed === undefined) {
