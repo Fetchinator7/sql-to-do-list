@@ -6,6 +6,8 @@ function onReady() {
   $('th').on('click', changeSortByCategory);
   $('.inputField').on('keydown', removeBoxWarning);
   getTasks();
+  const startUPSoundEffect = new Audio('/Resources/start_up.wav');
+  startUPSoundEffect.play();
 }
 
 const dataID = 'data-task-table-id';
