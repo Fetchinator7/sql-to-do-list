@@ -3,7 +3,7 @@ $(document).ready(onReady);
 function onReady() {
   $('#addTaskButton').on('click', addTaskToTable);
   $('#priorityIn').on('click', cyclePriority);
-  $('th').on('click', sort);
+  $('th').on('click', changeSortByCategory);
   $('.inputField').on('keydown', removeBoxWarning);
   getTasks();
 }
@@ -14,8 +14,9 @@ const cssCompleted = 'completed';
 const cssNotCompleted = 'notCompleted';
 
 let sortOrder = 'ASC';
+let sortBy;
 function getTasks(sort) {
-  let sortBy;
+  console.log('get tasks', sortOrder);
   if (sort === undefined) {
     sortBy = '';
   } else {
@@ -27,11 +28,6 @@ function getTasks(sort) {
     url: '/list/' + sortOrder + '/' + sortBy
   }).then((response) => {
     addToDOM(response);
-    if (sortOrder === 'ASC') {
-      sortOrder = 'DESC';
-    } else {
-      sortOrder = 'ASC';
-    }
   }).catch(() => {
     alert('Oh no, that get was rejected :(');
   }); // end getKoalas
@@ -71,7 +67,6 @@ function addTaskToTable() {
       due: inputFields[1].val(),
       notes: inputFields[2].val()
     };
-    console.log(inputFields[1].val());
     $.ajax({
       method: 'POST',
       url: '/list',
@@ -81,7 +76,7 @@ function addTaskToTable() {
       addedSoundEffect.play();
       emptyInputFields(inputFields);
       $('#viewTasks').empty();
-      getTasks();
+      getTasks(sortBy);
       updatejQuery();
     }).catch(() => {
       console.log('Oh no, that post was rejected :(');
@@ -221,9 +216,15 @@ function cyclePriority() {
   $('#priorityIn').val(taskPriority);
 }
 
-function sort(event) {
-  const sortBy = $(event.target).prop('id');
-  if (sortBy !== '') {
-    getTasks(sortBy);
+function changeSortByCategory(event) {
+  const sortByThis = $(event.target).prop('id');
+  if (sortByThis !== '') {
+    if (sortOrder === 'ASC') {
+      sortOrder = 'DESC';
+    } else {
+      sortOrder = 'ASC';
+    }
+    getTasks(sortByThis);
+    console.log('afterward', sortOrder);
   }
 }

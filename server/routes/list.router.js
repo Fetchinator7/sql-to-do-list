@@ -9,7 +9,6 @@ const pool = require('../modules/pool');
 listRouter.get('/:order?/:sort?', (req, res) => {
   const order = req.params.order; // name (or whatever gets passed in)
   const sort = req.params.sort; // name (or whatever gets passed in)
-  console.log(sort);
   let sortBy = 'completed'; // default
   if (sort === 'title') {
     sortBy = 'title';
