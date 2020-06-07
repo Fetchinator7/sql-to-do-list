@@ -10,14 +10,17 @@ function onReady() {
   startUPSoundEffect.play();
 }
 
+// these values are added to html elements and used to determine what action to take.
 const dataID = 'data-task-table-id';
 const dataCompleted = 'data-task-completed-bool';
 const cssCompleted = 'completed';
 const cssNotCompleted = 'notCompleted';
 
+// Get all the tasks from the table and include and optional "sort by" option.
 let sortOrder = 'ASC';
 let sortBy;
 function getTasks(sort) {
+  // If nothing was specified (like when the page loads) the server will default to completed.
   if (sort === undefined) {
     sortBy = '';
   } else {
@@ -27,15 +30,15 @@ function getTasks(sort) {
     type: 'GET',
     url: '/list/' + sortOrder + '/' + sortBy
   }).then((response) => {
+    // Loop through the results and display them.
     addToDOM(response);
   }).catch(() => {
     errorMessage('get');
-  }); // end getKoalas
-  // ajax call to server to get koalas
+  });
 }
 
-// Delete the book from the database and visually remove the book
-// so it doesn't have to make another query just to update that book.
+// Delete the task from the database and visually remove the task
+// so it doesn't have to make another query just to update that task.
 function deleteTask(event) {
   const row = $(event.target).parent();
   const tableDatabaseTableId = $(event.target).parent().attr(dataID);
@@ -53,7 +56,9 @@ function deleteTask(event) {
   });
 }
 
+// Get the values from the input fields and add a task to the database.
 function addTaskToTable() {
+  // Confirm the required fields are filled and if they're not don't proceed.
   const inputFieldValuesArr = checkIfInputFieldsWereFilled();
   if (inputFieldValuesArr.length !== 0) {
     const inputFields = [$('#titleIn'), $('#dueIn'), $('#notesIn')];
@@ -63,6 +68,7 @@ function addTaskToTable() {
     // console.log('new date:', dateObject);
     const taskToAdd = {
       title: inputFields[0].val(),
+      // Global variable for the task priority (!, !!, or, !!!)
       priority: taskPriority,
       due: inputFields[1].val(),
       notes: inputFields[2].val()
@@ -72,9 +78,11 @@ function addTaskToTable() {
       url: '/list',
       data: taskToAdd
     }).then(() => {
+      // Play a success sound effect.
       const addedSoundEffect = new Audio('/Resources/added.wav');
       addedSoundEffect.play();
       emptyInputFields(inputFields);
+      // Remove all of the displayed tasks and add them again.
       $('#viewTasks').empty();
       getTasks(sortBy);
       updatejQuery();
@@ -84,6 +92,7 @@ function addTaskToTable() {
   }
 }
 
+// Something was entered in a required field so remove the red highlighting.
 function removeBoxWarning(event) {
   $(event.target).removeClass('blankValue');
   $('#inputAttributeError').fadeOut(300);
@@ -114,49 +123,49 @@ function emptyInputFields(inputFieldsArr) {
   inputFieldsArr.map(input => $(input).val(''));
 }
 
-// Remove any books from the DOM and loop over every book in the table adding attributes
+// Remove any tasks from the DOM and loop over every task in the table adding attributes
 // and putting each value in its own table row.
 function addToDOM(response) {
   $('#viewTasks').empty();
-  for (const koalaObj of response) {
-    // Make a jQuery object of a table row and add the book values to that row.
+  for (const taskObj of response) {
+    // Make a jQuery object of a table row and add the task values to that row.
     const appendStr = '<tr></tr>';
     const jQueryObj = $(appendStr);
     let appendRowStr = '';
-    // Loop over every book in the table and add them to the DOM.
-    for (const koalaKey in koalaObj) {
-      const koalaVal = koalaObj[koalaKey];
+    // Loop over every task in the table and add them to the DOM.
+    for (const taskKey in taskObj) {
+      const taskVal = taskObj[taskKey];
       // If the inputs match certain strings format them to look prettier.
-      if (koalaKey === 'task_id') {
-        // The (arbitrary) "id" column is the unique identifier for the current book in
+      if (taskKey === 'task_id') {
+        // The (arbitrary) "id" column is the unique identifier for the current task in
         // the table so embed that which allows updates to be made later.
-        $(jQueryObj).attr(dataID, koalaVal);
-      } else if (koalaKey === 'completed') {
-        if (koalaVal === true) {
+        $(jQueryObj).attr(dataID, taskVal);
+      } else if (taskKey === 'completed') {
+        if (taskVal === true) {
           appendRowStr += '<td><input type="checkbox" class="toggleCompleted" checked></td>';
           // Add a class for display purposes and a arbitrary value for whether or not
-          // a book has been read into the html data.
+          // a task has been read into the html data.
           $(jQueryObj).addClass(cssCompleted).attr(dataCompleted, true);
         } else {
           appendRowStr += '<td><input type="checkbox" class="toggleCompleted"></td>';
           $(jQueryObj).addClass(cssNotCompleted).attr(dataCompleted, false);
         }
-      } else if (koalaKey === 'due' && koalaVal !== null) {
+      } else if (taskKey === 'due' && taskVal !== null) {
         // TODO format date correctly.
-        appendRowStr += `<td>${(koalaVal.substring(0, 10))}</td>`;
-      } else if (koalaVal === null) {
+        appendRowStr += `<td>${(taskVal.substring(0, 10))}</td>`;
+      } else if (taskVal === null) {
         appendRowStr += '<td></td>';
       } else {
-        // The current bookKey doesn't have a preset so just add verbatim whatever the
+        // The current taskKey doesn't have a preset so just add verbatim whatever the
         // key and value is to the DOM.
-        appendRowStr += `<td>${koalaVal}</td>`;
+        appendRowStr += `<td>${taskVal}</td>`;
       }
     }
-    // Add a button for toggling if a book has been read and deleting a book which are then
+    // Add a button for toggling if a task has been read and deleting a task which are then
     // updated in the table.
     const buttonText = '<button class="deleteTask"> Delete </button>';
     $(jQueryObj.html(appendRowStr).append(buttonText));
-    // Add this big long element to the books HTML table.
+    // Add this big long element to the tasks HTML table.
     $('#viewTasks').append(jQueryObj);
   }
   // Let jQuery know about the new buttons that have been added.
@@ -164,10 +173,10 @@ function addToDOM(response) {
 }
 
 // The "Toggle Read" button was clicked/pressed so change the classes
-// (for visual purposes) of that book and update that change in the database table.
+// (for visual purposes) of that task and update that change in the database table.
 function toggleCompleted(event) {
   const buttonEvent = event.target;
-  // Extract the unique identifier of a book stored in the row header.
+  // Extract the unique identifier of a task stored in the row header.
   const itemID = $(buttonEvent).closest('tr').attr(dataID);
   const itemAttributeBool = $(buttonEvent).closest('tr').attr(dataCompleted);
   // Set the new value to the opposite of the input value.
@@ -181,9 +190,7 @@ function toggleCompleted(event) {
     method: 'PUT',
     url: `/list/${itemID}/${toggledAttr}`
   }).then(() => {
-    // Change the text of the box two prior to the to the new bool value.
-    // $(event.target).prev().prev().text(toggledAttr);
-
+    // Visually update the new task status.
     $(buttonEvent).closest('tr').attr(dataCompleted, toggledAttr);
     if (toggledAttr === true) {
       const successSoundEffect = new Audio('/Resources/success.wav');
@@ -199,7 +206,7 @@ function toggleCompleted(event) {
   });
 }
 
-// After the table is filled
+// After the table is filled update the jQuery buttons.
 function updatejQuery() {
   $('.deleteTask').on('click', deleteTask);
   $('.toggleCompleted').on('click', toggleCompleted);
@@ -207,6 +214,7 @@ function updatejQuery() {
   $('#priorityIn').val(taskPriority);
 }
 
+// Whenever the the priority button is clicked cycle through the different options.
 let taskPriority = '   ';
 let taskPriorityIndex = 1;
 function cyclePriority() {
@@ -216,6 +224,7 @@ function cyclePriority() {
   $('#priorityIn').val(taskPriority);
 }
 
+// A row header was clicked so get all of the tasks sorted by that header category.
 function changeSortByCategory(event) {
   const sortByThis = $(event.target).prop('id');
   if (sortByThis !== '') {
@@ -230,6 +239,7 @@ function changeSortByCategory(event) {
   }
 }
 
+// There was a server issue so display an error.
 function errorMessage(err) {
   // Hopefully you don't every hear this one.
   const serverErrorSoundEffect = new Audio('/Resources/server_error.mp3');

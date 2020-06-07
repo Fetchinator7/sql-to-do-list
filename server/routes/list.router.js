@@ -1,15 +1,14 @@
 const express = require('express');
 const listRouter = express.Router();
 
-// DB CONNECTION
 const pool = require('../modules/pool');
 
-// GET /koalas/ (see server.js on how this koalaRouter is mounted to /koalas)
-// GET /koalas/?sort=id
+// Get the elements in the table with an optional sort by parameter.
 listRouter.get('/:order?/:sort?', (req, res) => {
-  const order = req.params.order; // name (or whatever gets passed in)
-  const sort = req.params.sort; // name (or whatever gets passed in)
-  let sortBy = 'completed'; // default
+  const order = req.params.order;
+  const sort = req.params.sort;
+  // Default sort by.
+  let sortBy = 'completed';
   if (sort === 'title') {
     sortBy = 'title';
   } else if (sort === 'priority') {
@@ -23,9 +22,10 @@ listRouter.get('/:order?/:sort?', (req, res) => {
   if (order === 'DESC') {
     orderBy = 'DESC';
   }
-  // create our SQL -- just a string
+  // create our SQL query (since the input can only be select options it doesn't have to be
+  // filtered further).
   const queryText = `SELECT * FROM "list" ORDER BY ${sortBy} ${orderBy}`;
-  // send our query to the pool (to postgres)
+  // send our query to the pool (to postgres).
   pool
     .query(queryText)
     .then((result) => {
@@ -35,12 +35,16 @@ listRouter.get('/:order?/:sort?', (req, res) => {
       console.log(`Error making query: ${queryText} ${error}`);
       res.sendStatus(500);
     });
-  // no return, no res.send -- its all taken care of in the pool handlers
 });
 
+// Post a new task to the database table.
 listRouter.post('/', (req, res) => {
+  // An object of the new task to add.
   const newTask = req.body;
+  // Remove any whitespace from the different "!" values.
   const inputs = [newTask.title, newTask.priority.trim(), newTask.due, newTask.notes];
+  // Since it's a POST null defaults to an empty string, but to work correctly SQL
+  // needs a null value so if the input is an empty string add it as null.
   const filtered = [];
   for (const attribute of inputs) {
     if (attribute === '' || attribute === undefined) {
@@ -49,6 +53,7 @@ listRouter.post('/', (req, res) => {
       filtered.push(attribute);
     }
   }
+  // Sanitize the input.
   const queryText = 'INSERT INTO "list" ("title", "priority", "due", "notes") VALUES ($1, $2, $3, $4);';
   pool.query(queryText, [
     filtered[0],
@@ -66,6 +71,7 @@ listRouter.post('/', (req, res) => {
     });
 });
 
+// Delete a task from the table based on its unique id.
 listRouter.delete('/:id', (req, res) => {
   const taskId = req.params.id;
   const queryText = 'DELETE FROM "list" WHERE task_id=$1';
@@ -81,12 +87,11 @@ listRouter.delete('/:id', (req, res) => {
     });
 });
 
-// PUT --> update the transfer status
+// Toggle the completed status.
 listRouter.put('/:id/:completed', (req, res) => {
   const taskId = req.params.id;
   const completed = req.params.completed;
-  // Set the queryText to update to "true" or "false" depending on
-  // what it currently is at the specific id
+  // Set the queryText to update to either "true" or "false".
   const queryText = 'UPDATE "list" SET "completed"=$1 WHERE task_id=$2;';
   pool.query(queryText, [completed, taskId])
     .then(() => {
