@@ -33,6 +33,8 @@ function deleteTask(event) {
     method: 'DELETE',
     url: '/list/' + tableDatabaseTableId
   }).then(() => {
+    const deletedSoundEffect = new Audio('/Resources/deleted.wav');
+    deletedSoundEffect.play();
     $(row).fadeOut(800, () => {
       $(row).remove();
     });
@@ -61,6 +63,8 @@ function addTaskToTable() {
       url: '/list',
       data: taskToAdd
     }).then(() => {
+      const addedSoundEffect = new Audio('/Resources/added.wav');
+      addedSoundEffect.play();
       emptyInputFields(inputFields);
       $('#viewTasks').empty();
       getTasks();
@@ -85,6 +89,8 @@ function checkIfInputFieldsWereFilled() {
     // Remove the red highlighting from each box (it will be added again if it's still empty.)
     $(inputField).removeClass('blankValue');
     if (inputField.val() === '') {
+      const invalidInputSoundEffect = new Audio('/Resources/invalidInput.wav');
+      invalidInputSoundEffect.play();
       $(inputField).addClass('blankValue');
       const boxPromptValue = $(inputField).attr('placeholder');
       $('#inputAttributeError').text(`Error, the "${boxPromptValue}" attribute is required.`).fadeIn(800);
@@ -171,8 +177,12 @@ function toggleCompleted(event) {
 
     $(buttonEvent).closest('tr').attr(dataCompleted, toggledAttr);
     if (toggledAttr === true) {
+      const successSoundEffect = new Audio('/Resources/success.wav');
+      successSoundEffect.play();
       $(buttonEvent).closest('tr').addClass(cssCompleted).removeClass(cssNotCompleted);
     } else {
+      const incompleteSoundEffect = new Audio('/Resources/incomplete.wav');
+      incompleteSoundEffect.play();
       $(buttonEvent).closest('tr').addClass(cssNotCompleted).removeClass(cssCompleted);
     }
   }).catch(() => {
