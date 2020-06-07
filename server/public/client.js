@@ -121,6 +121,10 @@ function addToDOM(response) {
           appendRowStr += '<td><input type="checkbox" class="toggleCompleted"></td>';
           $(jQueryObj).addClass(cssNotCompleted).attr(dataCompleted, false);
         }
+      } else if (koalaKey === 'due' && koalaVal !== null) {
+        console.log(koalaVal);
+        // TODO format date correctly.
+        appendRowStr += `<td>${new Date(koalaVal).toDateString()}</td>`;
       } else if (koalaVal === null) {
         appendRowStr += '<td></td>';
       } else {
@@ -128,6 +132,7 @@ function addToDOM(response) {
         // key and value is to the DOM.
         appendRowStr += `<td>${koalaVal}</td>`;
       }
+      console.log(String(koalaVal).endsWith('.000Z'), 'test');
     }
     // Add a button for toggling if a book has been read and deleting a book which are then
     // updated in the table.
