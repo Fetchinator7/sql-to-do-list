@@ -223,7 +223,8 @@ function changeSortByCategory(event) {
       sortOrder = 'ASC';
     }
     getTasks(sortByThis);
-    console.log('afterward', sortOrder);
+    const reorderSoundEffect = new Audio('/Resources/reorder.mp3');
+    reorderSoundEffect.play();
   }
 }
 
