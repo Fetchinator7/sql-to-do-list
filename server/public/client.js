@@ -16,20 +16,18 @@ const cssNotCompleted = 'notCompleted';
 let sortOrder = 'ASC';
 let sortBy;
 function getTasks(sort) {
-  console.log('get tasks', sortOrder);
   if (sort === undefined) {
     sortBy = '';
   } else {
     sortBy = sort;
   }
-  console.log('sort by', sortBy);
   $.ajax({
     type: 'GET',
     url: '/list/' + sortOrder + '/' + sortBy
   }).then((response) => {
     addToDOM(response);
   }).catch(() => {
-    alert('Oh no, that get was rejected :(');
+    errorMessage('get');
   }); // end getKoalas
   // ajax call to server to get koalas
 }
@@ -49,7 +47,7 @@ function deleteTask(event) {
       $(row).remove();
     });
   }).catch(() => {
-    alert('Oh no, that delete was rejected :(');
+    errorMessage('delete');
   });
 }
 
@@ -79,7 +77,7 @@ function addTaskToTable() {
       getTasks(sortBy);
       updatejQuery();
     }).catch(() => {
-      console.log('Oh no, that post was rejected :(');
+      errorMessage('post');
     });
   }
 }
@@ -98,7 +96,7 @@ function checkIfInputFieldsWereFilled() {
     // Remove the red highlighting from each box (it will be added again if it's still empty.)
     $(inputField).removeClass('blankValue');
     if (inputField.val() === '') {
-      const invalidInputSoundEffect = new Audio('/Resources/invalidInput.wav');
+      const invalidInputSoundEffect = new Audio('/Resources/invalid_input.wav');
       invalidInputSoundEffect.play();
       $(inputField).addClass('blankValue');
       const boxPromptValue = $(inputField).attr('placeholder');
@@ -195,7 +193,7 @@ function toggleCompleted(event) {
       $(buttonEvent).closest('tr').addClass(cssNotCompleted).removeClass(cssCompleted);
     }
   }).catch(() => {
-    alert('Oh no, that toggle post was rejected :(');
+    errorMessage('toggle post');
   });
 }
 
@@ -227,4 +225,11 @@ function changeSortByCategory(event) {
     getTasks(sortByThis);
     console.log('afterward', sortOrder);
   }
+}
+
+function errorMessage(err) {
+  // Hopefully you don't every hear this one.
+  const serverErrorSoundEffect = new Audio('/Resources/server_error.mp3');
+  serverErrorSoundEffect.play();
+  alert(`Oh no, that ${err} was rejected :(`);
 }
