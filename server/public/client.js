@@ -45,12 +45,17 @@ function addTaskToTable() {
   const inputFieldValuesArr = checkIfInputFieldsWereFilled();
   if (inputFieldValuesArr.length !== 0) {
     const inputFields = [$('#titleIn'), $('#dueIn'), $('#notesIn')];
+    // const due = inputFields[1].val().split(/[- :]/);
+    // due[1]--;
+    // const dateObject = new Date(...due);
+    // console.log('new date:', dateObject);
     const taskToAdd = {
       title: inputFields[0].val(),
       priority: taskPriority,
       due: inputFields[1].val(),
       notes: inputFields[2].val()
     };
+    console.log(inputFields[1].val());
     $.ajax({
       method: 'POST',
       url: '/list',
@@ -122,9 +127,8 @@ function addToDOM(response) {
           $(jQueryObj).addClass(cssNotCompleted).attr(dataCompleted, false);
         }
       } else if (koalaKey === 'due' && koalaVal !== null) {
-        console.log(koalaVal);
         // TODO format date correctly.
-        appendRowStr += `<td>${new Date(koalaVal).toDateString()}</td>`;
+        appendRowStr += `<td>${(koalaVal.substring(0, 10))}</td>`;
       } else if (koalaVal === null) {
         appendRowStr += '<td></td>';
       } else {
@@ -132,7 +136,6 @@ function addToDOM(response) {
         // key and value is to the DOM.
         appendRowStr += `<td>${koalaVal}</td>`;
       }
-      console.log(String(koalaVal).endsWith('.000Z'), 'test');
     }
     // Add a button for toggling if a book has been read and deleting a book which are then
     // updated in the table.
