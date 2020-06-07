@@ -27,3 +27,7 @@
 body {
  background-color: grey;
 }
+
+.sortByCategory:hover, button:hover {
+ cursor: pointer;
+}
