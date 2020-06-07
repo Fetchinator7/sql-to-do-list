@@ -12,16 +12,16 @@
 ## My stretch goals:
 ## Realistic:
 ~~Give a "notes" field to add notes about a task.~~
-~~Assign a "Priority" option for each task (None, !, !!, or, !!! which can be
-changed by clicking a button and it rotates through those different values.)~~
+~~Assign a "Priority" option for each task (None, !, !!, or, !!! which can be~~
+~~changed by clicking a button and it rotates through those different values.)~~
 ~~Assign a date/time a task should be completed.~~
 Show when a task was added and completed.
 Countdown timer?
 
 ## Unsure how realistic these are in the time I have:
 Allow a task to repeat automatically
-Click on a category/attribute to toggle between sorting by that ASC or DESC
-Play sound effects when a task is completed, deleted, etc.
+~~Click on a category/attribute to toggle between sorting by that ASC or DESC~~
+~~Play sound effects when a task is completed, deleted, etc.~~
 Assign a category for a task.
 Edit any attribute by clicking it and changing it.
 Filter viewing options such as only showing !!! tasks.

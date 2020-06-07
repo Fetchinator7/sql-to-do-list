@@ -3,6 +3,7 @@ $(document).ready(onReady);
 function onReady() {
   $('#addTaskButton').on('click', addTaskToTable);
   $('#priorityIn').on('click', cyclePriority);
+  $('th').on('click', sort);
   $('.inputField').on('keydown', removeBoxWarning);
   getTasks();
 }
@@ -12,12 +13,25 @@ const dataCompleted = 'data-task-completed-bool';
 const cssCompleted = 'completed';
 const cssNotCompleted = 'notCompleted';
 
-function getTasks() {
+let sortOrder = 'ASC';
+function getTasks(sort) {
+  let sortBy;
+  if (sort === undefined) {
+    sortBy = '';
+  } else {
+    sortBy = sort;
+  }
+  console.log('sort by', sortBy);
   $.ajax({
     type: 'GET',
-    url: '/list'
+    url: '/list/' + sortOrder + '/' + sortBy
   }).then((response) => {
     addToDOM(response);
+    if (sortOrder === 'ASC') {
+      sortOrder = 'DESC';
+    } else {
+      sortOrder = 'ASC';
+    }
   }).catch(() => {
     alert('Oh no, that get was rejected :(');
   }); // end getKoalas
@@ -108,7 +122,7 @@ function emptyInputFields(inputFieldsArr) {
 // Remove any books from the DOM and loop over every book in the table adding attributes
 // and putting each value in its own table row.
 function addToDOM(response) {
-  $('#viewKoalas').empty();
+  $('#viewTasks').empty();
   for (const koalaObj of response) {
     // Make a jQuery object of a table row and add the book values to that row.
     const appendStr = '<tr></tr>';
@@ -205,4 +219,11 @@ function cyclePriority() {
   taskPriority = arr[taskPriorityIndex];
   taskPriorityIndex = (taskPriorityIndex + 1) % (arr.length);
   $('#priorityIn').val(taskPriority);
+}
+
+function sort(event) {
+  const sortBy = $(event.target).prop('id');
+  if (sortBy !== '') {
+    getTasks(sortBy);
+  }
 }
