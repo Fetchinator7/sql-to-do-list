@@ -13,19 +13,25 @@ const dataCompleted = 'data-task-completed-bool';
 const cssCompleted = 'completed';
 const cssNotCompleted = 'notCompleted';
 
-function getTasks(sortBy) {
-  let sort;
-  if (sortBy === undefined) {
-    sort = '';
+let sortOrder = 'ASC';
+function getTasks(sort) {
+  let sortBy;
+  if (sort === undefined) {
+    sortBy = '';
   } else {
-    sort = sortBy;
+    sortBy = sort;
   }
   console.log('sort by', sortBy);
   $.ajax({
     type: 'GET',
-    url: '/list/' + sort
+    url: '/list/' + sortOrder + '/' + sortBy
   }).then((response) => {
     addToDOM(response);
+    if (sortOrder === 'ASC') {
+      sortOrder = 'DESC';
+    } else {
+      sortOrder = 'ASC';
+    }
   }).catch(() => {
     alert('Oh no, that get was rejected :(');
   }); // end getKoalas
@@ -217,5 +223,7 @@ function cyclePriority() {
 
 function sort(event) {
   const sortBy = $(event.target).prop('id');
-  getTasks(sortBy);
+  if (sortBy !== '') {
+    getTasks(sortBy);
+  }
 }

@@ -6,7 +6,8 @@ const pool = require('../modules/pool');
 
 // GET /koalas/ (see server.js on how this koalaRouter is mounted to /koalas)
 // GET /koalas/?sort=id
-listRouter.get('/:sort?', (req, res) => {
+listRouter.get('/:order?/:sort?', (req, res) => {
+  const order = req.params.order; // name (or whatever gets passed in)
   const sort = req.params.sort; // name (or whatever gets passed in)
   console.log(sort);
   let sortBy = 'completed'; // default
@@ -19,8 +20,12 @@ listRouter.get('/:sort?', (req, res) => {
   } else if (sort === 'notes') {
     sortBy = 'notes';
   }
+  let orderBy = 'ASC';
+  if (order === 'DESC') {
+    orderBy = 'DESC';
+  }
   // create our SQL -- just a string
-  const queryText = `SELECT * FROM "list" ORDER BY ${sortBy}`;
+  const queryText = `SELECT * FROM "list" ORDER BY ${sortBy} ${orderBy}`;
   // send our query to the pool (to postgres)
   pool
     .query(queryText)
