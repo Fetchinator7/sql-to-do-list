@@ -1,17 +1,16 @@
 $(document).ready(onReady);
 
-const inputFields = [$('#input1'), $('#input2')];
-const requiredInputFields = [$('#input1')];
+function onReady() {
+  $('#addTaskButton').on('click', addTaskToTable);
+  $('#priorityIn').on('click', cyclePriority);
+  $('.inputField').on('keydown', removeBoxWarning);
+  getTasks();
+}
+
 const dataID = 'data-task-table-id';
 const dataCompleted = 'data-task-completed-bool';
 const cssCompleted = 'completed';
 const cssNotCompleted = 'notCompleted';
-
-function onReady() {
-  $('#addTaskButton').on('click', primaryAction);
-  $('.viewTasks').on('keydown', removeBoxWarning);
-  getTasks();
-}
 
 function getTasks() {
   $.ajax({
@@ -45,33 +44,25 @@ function deleteTask(event) {
 function addTaskToTable() {
   const inputFieldValuesArr = checkIfInputFieldsWereFilled();
   if (inputFieldValuesArr.length !== 0) {
+    const inputFields = [$('#titleIn'), $('#dueIn'), $('#notesIn')];
     const taskToAdd = {
-      completed: inputFields[0].val(),
-      title: inputFields[1].val(),
-      priority: inputFields[2].val(),
-      due: inputFields[3].val(),
-      notes: inputFields[4].val()
+      title: inputFields[0].val(),
+      priority: taskPriority,
+      due: inputFields[1].val(),
+      notes: inputFields[2].val()
     };
     $.ajax({
       method: 'POST',
       url: '/list',
       data: taskToAdd
     }).then(() => {
-      emptyInputFields();
+      emptyInputFields(inputFields);
+      $('#viewTasks').empty();
       getTasks();
       updatejQuery();
     }).catch(() => {
-      alert('Oh no, that post was rejected :(');
+      console.log('Oh no, that post was rejected :(');
     });
-  }
-}
-
-function primaryAction() {
-  const inputFieldValuesArr = checkIfInputFieldsWereFilled();
-  if (inputFieldValuesArr.length !== 0) {
-    console.log(inputFieldValuesArr);
-    // Do stuff.
-    emptyInputFields();
   }
 }
 
@@ -82,6 +73,7 @@ function removeBoxWarning(event) {
 
 // Check that all the input fields were filled before returning an array of their values.
 function checkIfInputFieldsWereFilled() {
+  const requiredInputFields = [$('#titleIn')];
   // Remove the error message (only noticeable if it's currently displayed.)
   $('#inputAttributeError').fadeOut(300);
   for (const inputField of requiredInputFields) {
@@ -94,12 +86,12 @@ function checkIfInputFieldsWereFilled() {
       return [];
     }
   }
-  return inputFields;
+  return requiredInputFields;
 }
 
 // Empty all input fields.
-function emptyInputFields() {
-  inputFields.map(input => $(input).val(''));
+function emptyInputFields(inputFieldsArr) {
+  inputFieldsArr.map(input => $(input).val(''));
 }
 
 // Remove any books from the DOM and loop over every book in the table adding attributes
@@ -176,7 +168,7 @@ function toggleCompleted(event) {
       $(buttonEvent).closest('tr').addClass(cssNotCompleted).removeClass(cssCompleted);
     }
   }).catch(() => {
-    alert('Oh no, that post was rejected :(');
+    alert('Oh no, that toggle post was rejected :(');
   });
 }
 
@@ -184,4 +176,15 @@ function toggleCompleted(event) {
 function updatejQuery() {
   $('.deleteTask').on('click', deleteTask);
   $('.toggleCompleted').on('click', toggleCompleted);
+  taskPriority = '  ';
+  $('#priorityIn').val(taskPriority);
+}
+
+let taskPriority = '   ';
+let taskPriorityIndex = 1;
+function cyclePriority() {
+  const arr = ['   ', '!  ', '!! ', '!!!'];
+  taskPriority = arr[taskPriorityIndex];
+  taskPriorityIndex = (taskPriorityIndex + 1) % (arr.length);
+  $('#priorityIn').val(taskPriority);
 }

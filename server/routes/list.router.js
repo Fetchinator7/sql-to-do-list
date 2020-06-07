@@ -31,22 +31,24 @@ listRouter.get('/', (req, res) => {
 
 listRouter.post('/', (req, res) => {
   const newTask = req.body;
-  console.log('Adding task', newTask);
-  const queryText = 'INSERT INTO "list" ("title", "completed", "priority", "due", "notes") VALUES ($1, $2, $3, $4, $5);';
-  let completed;
-  if (newTask.completed === undefined) {
-    completed = false;
-  } else {
-    completed = newTask.completed;
+  const inputs = [newTask.title, newTask.priority.trim(), newTask.due, newTask.notes];
+  const filtered = [];
+  for (const attribute of inputs) {
+    if (attribute === '' || attribute === undefined) {
+      filtered.push(null);
+    } else {
+      filtered.push(attribute);
+    }
   }
+  const queryText = 'INSERT INTO "list" ("title", "priority", "due", "notes") VALUES ($1, $2, $3, $4);';
   pool.query(queryText, [
-    newTask.title,
-    completed,
-    newTask.priority,
-    newTask.due,
-    newTask.notes
+    filtered[0],
+    filtered[1],
+    filtered[2],
+    filtered[3]
   ])
     .then(() => {
+      console.log('Added task!');
       res.sendStatus(201);
     })
     .catch((error) => {
