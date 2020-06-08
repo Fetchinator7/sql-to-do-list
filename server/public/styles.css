@@ -28,6 +28,6 @@ body {
  background-color: grey;
 }
 
-.sortByCategory:hover, button:hover {
+.sortByCategory:hover, button:hover, input:hover {
  cursor: pointer;
 }
