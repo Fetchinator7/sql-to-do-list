@@ -22,6 +22,13 @@ listRouter.get('/:order?/:sort?', (req, res) => {
   if (order === 'DESC') {
     orderBy = 'DESC';
   }
+  // let queryText;
+  // // order BY completed, name ASC
+  // if (sort === 'priority') {
+  //   queryText = `SELECT * FROM "list" ORDER BY ${sortBy} ${orderBy}, ${sortBy}`;
+  // } else {
+  //   queryText = `SELECT * FROM "list" ORDER BY ${sortBy} ${orderBy}`;
+  // }
   // create our SQL query (since the input can only be select options it doesn't have to be
   // filtered further).
   const queryText = `SELECT * FROM "list" ORDER BY ${sortBy} ${orderBy}`;

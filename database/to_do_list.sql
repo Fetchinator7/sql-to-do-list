@@ -5,6 +5,6 @@ CREATE TABLE "list"
     "title" varchar(200) NOT NULL,
     "priority" varchar(3) DEFAULT NULL,
     CONSTRAINT priority_exclamation_mark_only CHECK (priority IN ('!', '!!', '!!!')),
-    "due" DATE DEFAULT NULL,
+    "due" TIMESTAMP DEFAULT NULL,
     "notes" varchar(500)
 );

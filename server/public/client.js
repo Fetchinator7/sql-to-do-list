@@ -62,15 +62,17 @@ function addTaskToTable() {
   const inputFieldValuesArr = checkIfInputFieldsWereFilled();
   if (inputFieldValuesArr.length !== 0) {
     const inputFields = [$('#titleIn'), $('#dueIn'), $('#notesIn')];
-    // const due = inputFields[1].val().split(/[- :]/);
-    // due[1]--;
-    // const dateObject = new Date(...due);
-    // console.log('new date:', dateObject);
+    let formattedDate;
+    if (inputFields[1].val() === '') {
+      formattedDate = null;
+    } else {
+      formattedDate = moment(inputFields[1].val()).format('YYYY-MM-DD HH:mm:ss');
+    }
     const taskToAdd = {
       title: inputFields[0].val(),
       // Global variable for the task priority (!, !!, or, !!!)
       priority: taskPriority,
-      due: inputFields[1].val(),
+      due: formattedDate,
       notes: inputFields[2].val()
     };
     $.ajax({
@@ -152,7 +154,7 @@ function addToDOM(response) {
         }
       } else if (taskKey === 'due' && taskVal !== null) {
         // TODO format date correctly.
-        appendRowStr += `<td>${(taskVal.substring(0, 10))}</td>`;
+        appendRowStr += `<td>${(moment(taskVal).format('YYYY/MM/DD, hh:mm a'))}</td>`;
       } else if (taskVal === null) {
         appendRowStr += '<td></td>';
       } else {

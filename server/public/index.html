@@ -5,6 +5,8 @@
     <meta charset="utf-8">
     <title>To Do List</title>
     <script src="https://code.jquery.com/jquery-3.5.1.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.26.0/moment.min.js"></script>
     <script src="client.js" charset="utf-8" async defer></script>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
@@ -20,7 +22,7 @@
         <div class="taskInputForm">
             <input type="text" id="titleIn" value="" class="inputField" placeholder="Title">
             <input type="button" id="priorityIn" value="   " class="inputField">
-            <input type="date" id="dueIn" class="inputField" placeholder="Due Date">
+            <input type="datetime-local" id="dueIn" class="inputField" placeholder="Due Date">
             <input type="text" id="notesIn" value="" class="inputField" placeholder="Notes">
             <button type="button" id="addTaskButton">Add Task</button>
         </div>
